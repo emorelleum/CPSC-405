@@ -54,7 +54,7 @@ int main(int argc, char **argv)
        // parent closes output side of pipe
        close(fd[1]);
        wait(&status);
-       bytes = read(fd[0], buffer, sizeof(buffer));
+       read(fd[0], buffer, sizeof(buffer));
        printf("Eeyore says: '%s'\n", buffer);
   }
   
