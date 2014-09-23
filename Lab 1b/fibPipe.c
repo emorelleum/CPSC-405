@@ -65,10 +65,7 @@ static void doFib(int n, int doPrint){
 	int status1;
 	int status2;
 	int fd[2];
-	if(pipe(fd) == -1){
-		unix_error("Pipe Error");
-	}  // create the pipe
-	
+
 
 	int *sum = 0;		
 	if(n <=  1){
@@ -80,7 +77,12 @@ static void doFib(int n, int doPrint){
 		close(fd[0]);
 		write(fd[1], sum, sizeof(int));	 //writes to pipe output
 		exit(0);
-	}
+	}	
+    
+    if(pipe(fd) == -1){
+		unix_error("Pipe Error");
+	}  // create the pipe
+	
 	pid1 = Fork();
 	if(pid1==0){
 		doFib(n-1, 0);
