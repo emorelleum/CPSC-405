@@ -9,18 +9,14 @@
 #include <errno.h>
 
 const int MAX = 13;
-
 static void doFib(int n, int doPrint);
 
-
-
  //unix_error - unix-style error routine.
-inline static void unix_error(char *msg)
-{
+inline static void unix_error(char *msg){
     fprintf(stdout, "%s: %s\n", msg, strerror(errno));
     exit(1);
 }
-pid_t Fork(void) {
+pid_t Fork(void){
 	pid_t pid;
 	if ((pid = fork()) < 0)
 	        unix_error("Fork Error");
@@ -62,42 +58,44 @@ int main(int argc, char **argv){
 static void doFib(int n, int doPrint){
 	pid_t pid1;
 	pid_t pid2;
-	int status1;
-	int status2;
+	int status;
 	int fd[2];
-	if(pipe(fd) == -1){
-		unix_error("Pipe Error");
-	}  // create the pipe
-	
 
-	int *sum = 0;		
-	if(n <=  1){
-		printf("%d\n", n); //tests output
-		read(fd[0], sum, sizeof(int)); //reads from pipe
-		int x = (*sum) + n;
-		sum = &x; //increments pipe input value by n
-		
-		close(fd[0]);
-		write(fd[1], sum, sizeof(int));	 //writes to pipe output
-		exit(0);
+	int *sum = 0, *num = 0;
+	int x = 0, y = 0;
+	sum = &x;
+	num = &y;		
+	if(n <=  1){ //0 or 1
+		(*sum) = n;
 	}
-	pid1 = Fork();
-	if(pid1==0){
-		doFib(n-1, 0);
-		exit(0);
-	}
-	pid2 = Fork();
-	if(pid2==0){
-		doFib(n-2, 0);
-		exit(0);
-	}
+	else{
+		if(pipe(fd) == -1){
+			unix_error("Pipe Error");
+		}  // create the pipe
 
-	waitpid(pid1, &status1, 0);
-	waitpid(pid2, &status2, 0);
-	if(doPrint){
-		printf("doPrint");
-		read(fd[1], &sum, sizeof(int));
-		printf("%d", (*sum));
+		pid1 = Fork();
+		if(pid1==0){
+			doFib(n-1, fd[1]);
+		}
+		pid2 = Fork();
+		if(pid2==0){
+			doFib(n-2, fd[1]);
+		}
+		waitpid(pid1, &status, 0);
+		waitpid(pid2, &status, 0);
+		close(fd[1]);
+		int i = 0;
+		for(i = 0; i < 2; i++){
+			read(fd[0], num, sizeof(int));
+			(*sum) += (*num);
+		}
 	}	
-	exit(0);
+	if(doPrint == 1){
+		printf("%d\n", (*sum));
+		exit(0);
+	}
+	else{
+		write(doPrint, sum, sizeof(int));
+		exit(0);
+	}
 }
