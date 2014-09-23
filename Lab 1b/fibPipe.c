@@ -92,7 +92,6 @@ static void doFib(int n, int doPrint){
 	}	
 	if(doPrint == 1){
 		printf("%d\n", (*sum));
-		exit(0);
 	}
 	else{
 		write(doPrint, sum, sizeof(int));
