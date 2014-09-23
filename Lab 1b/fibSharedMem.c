@@ -14,7 +14,6 @@ const int MAX = 13;
 #define SHMSZ     1024
 static void doFib(int n, int doPrint);
 
-
 /*
  * unix_error - unix-style error routine.
  */
