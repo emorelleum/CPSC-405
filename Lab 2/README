@@ -17,13 +17,16 @@ Answers to questions in lab 2
 ################
 (1) What is the last assembly language instruction executed by the
   signal handler function that you write?
+The last assembly language instruction executed by the signal handler function we wrote was call exit.
 
 (2) After the instruction just identified executes, what is the next
   assembly language instruction executed?
+After the instruction executes, the next assembly language instruction executed is .cfi_endproc.
 
 (3) When the signal handler finishes running, it must restore all of
   the registers from the interrupted thread to exactly their values
   before the signal occurred. How is this done?
+  The signal handler restores all of the registers from the interrupted thread to exactly their values before the signal occurred by moving the value of esp to register 10. 
 
 
 

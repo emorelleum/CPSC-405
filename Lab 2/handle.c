@@ -5,26 +5,37 @@
 #include <assert.h>
 #include <errno.h>
 #include <time.h>
-#include "util.h"
 
 
-void my_handler(int s){
+void sigint_handler(int s){
 	size_t bytes;
 	const int STDOUT = 1;
-	bytes = write(STDOUT, "Nice try.\n", 10); if(bytes != 10)
-	fflush(stdout);	
+	bytes = write(STDOUT, "Nice try.\n", 10); 
+	if(bytes != 10){
+		exit(-999);	
+	}
 }
 
-int main(int argc,char** argv)
-{
+void sigusr1_handler(int s){
+	size_t bytes;
+	const int STDOUT = 1;
+	bytes = write(STDOUT, "exiting\n", 8);
+	if(bytes != 8){
+		exit(-999);
+	}
+	else{ 
+		exit(1);
+	}
+}
 
-	struct sigaction old_action;
+int main(int argc,char** argv){
+	printf("%d\n", getpid());
+	if (signal(SIGINT, sigint_handler) == SIG_ERR)
+		printf("signal error: \n");
 
-	old_action.sa_handler = my_handler;
-	sigemptyset(&old_action.sa_mask);
-	old_action.sa_flags = 0;
-
-	sigaction(SIGINT, &old_action, NULL);
+	if (signal(SIGUSR1, sigusr1_handler) == SIG_ERR)
+		printf("signal error: \n");
+	
 	while(1){
 		struct timespec tim, tim2;
 		tim.tv_sec = 1;
