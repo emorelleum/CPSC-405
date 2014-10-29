@@ -39,8 +39,7 @@ void sigquit_handler(int sig);
 /*
  * main - The shell's main routine 
  */
-int main(int argc, char **argv) 
-{
+int main(int argc, char **argv){
     char c;
     char cmdline[MAXLINE];
     int emit_prompt = 1; /* emit prompt (default) */
@@ -124,7 +123,8 @@ void eval(char *cmdline)
 				exit(0);
 			}
 		}
-
+		
+		waitpid(pid);
 		/* Parent waits for foreground job to terminate */
 		if (!bg) {
 			int status;
@@ -152,7 +152,14 @@ int builtin_cmd(char **argv){
 	return 0;     /* not a builtin command */
 }
 
-
+/* If first arg is a builtin command, run it and return true */
+int builtin_command(char **argv){
+	if (!strcmp(argv[0], "quit")) /* quit command */
+		exit(0);
+	if (!strcmp(argv[0], "&")) /* Ignore singleton & */
+		return 1;
+	return 0; /* Not a builtin command */
+}
 
 
 

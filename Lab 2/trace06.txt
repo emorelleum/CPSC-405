@@ -5,4 +5,5 @@
 ./myspin 4 
 
 SLEEP 2
+jobs
 INT

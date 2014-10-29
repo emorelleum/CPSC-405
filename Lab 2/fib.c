@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  doFib(arg, 1);
+  doFib(arg, print);
 
   return 0;
 }
