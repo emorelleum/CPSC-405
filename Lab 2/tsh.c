@@ -139,7 +139,7 @@ void eval(char *cmdline){
 			sigprocmask(SIG_UNBLOCK, &mask, NULL);
 			if (execve(argv[0], argv, environ) < 0) {
 				printf("%s: Command not found.\n", argv[0]);
-				return;
+				exit(1);
 			}
 		}
 		/* Parent waits for foreground job to terminate */
@@ -166,7 +166,7 @@ void eval(char *cmdline){
 /* If first arg is a builtin command, run it and return true */
 int builtin_cmd(char **argv){
 	if (!strcmp(argv[0], "quit")){ /* quit command */
-		exit(0);
+		exit(1);
 		return 1;
 	}
 	if(!strcmp(argv[0], "jobs")){
@@ -199,7 +199,7 @@ void do_bgfg(char **argv){
 				job = getjobjid(jobs, jid);
 				if(job == NULL){
 					valid = 0;
-					printf("%s: No such job\n", argv[1]); 
+					printf("%c%s: No such job\n", 0x25, argv[1]); 
 				}
 			}
 		}
@@ -264,7 +264,7 @@ void sigchld_handler(int sig){
 	if(pid){
 		struct job_t *job = getjobpid(jobs, pid);
 		int jobid = job->jid;
-		if(WIFSTOPPED(status) && WSTOPSIG(status) == 20){
+		if(WSTOPSIG(status) == 20){
 			printf("Job [%d] (%d) stopped by signal %d\n", jobid, pid, WSTOPSIG(status));
 			job->state = 3;
 		}
@@ -272,8 +272,11 @@ void sigchld_handler(int sig){
 			printf("Job [%d] (%d) terminated by signal %d\n", jobid, pid, WTERMSIG(status));
 			deletejob(jobs, pid);
 		}
-		else if(WIFEXITED(status)){
+		else if(WIFEXITED(status) || WIFSTOPPED(status)){
 			deletejob(jobs, pid);
+			if(WIFSTOPPED(status)){
+				printf("\n");
+			}
 		}
 
 	}
