@@ -102,14 +102,15 @@ static void phy(int n, int doPrint){
 	pid1 = fork();
 	if(pid1 == 0){
 		phy(n-1, 0);
-	}
-	pid2 = fork();
-	if(pid2 == 0){
-		phy(n-2, 0);
+		pid2 = fork();
+		if(pid2 == 0){
+			phy(n-2, 0);
+		}
+		waitpid(pid2, &status, 0); // pid1 waits for pid2 to finish
 	}
 
-	waitpid(pid1, &status, 0); //parent process waits til this finishes
-	waitpid(pid2, &status, 0); //parent process waits til this finishes
+	waitpid(pid1, &status, 0); //parent process waits for pid1 to finish
+	
 	result[n] = (result[n-1]) + (result[n-2] + result[n-3]);
 	if(doPrint){
 		printf("%d\n", result[n]); //prints final answer if doPrint is 1
